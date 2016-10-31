@@ -10,17 +10,80 @@
 <body>
 <h2>Lesson 19 - Particle Engines</h2>
 
-<p>The quadrics example is very easy since three.jsprovides built-in quadrics support. However, as always, there are a couple of wrinkles so let's go over it briefly.</p>
+<p>A particle system is a technique in game physics, motion graphics, and computer graphics that uses a large number of very small sprites, 3D models, or other graphic objects to simulate certain kinds of &quot;fuzzy&quot; phenomena, which are otherwise very hard to reproduce with conventional rendering techniques - usually highly chaotic systems, natural phenomena, or processes caused by chemical reactions. The algorithmic implementation of such particle systems is often referred to as a particle engine. This lesson is a demonstration of two such particle engines.</p>
+<p>In contrast to the last lesson, this one is fairly complex for two reasons. First, the support by three.js for particle engines is relatively primitive so the user has to do a bit more work than for quadrics. Secondly, the particle engine support in three.js is relatively simple in that it only support simple image-based sprites. And those sprites (like the sprites we saw in lesson 13) always face the camera, so they're not very flexible.</p>
+<p>So we'll also implement our own particle engine which will demonstrate the basic principles. The tradeoff is that while the three.js particle system can handle a huge number of particles and still be performant, our own particle engine will bog down with a far smaller number of particles.</p>
 <p>We initialize the gfxScene object same as always. We also declare some global vars:</p>
 
-<pre><code class="language-javascript">var quadTexture;
-var	quadric;
-var	quadGeometry;
-var	quadMaterial;
-var	materialType = 'p';	// texture, paint or wire
-var	quadType = 'b';</code></pre>
+<pre><code class="language-javascript">var ELEV         = 25;
+var DISTRIBX     = 20;
+var DISTRIBZ     = 20;
+var DELTA_ELEV   = 10;
+var FLOOR_REPEAT = 5;
+var clock;
+var particleSystem;		
+var cannon       = null;
+var beachBall    = null;</code></pre>
+
+<p>We'll go over what each of these is for as we go along. Next step is to instantiate the scene, which is pretty standard. We do specify a floor of size 5x5 tiles so we end up with a 20x20 checkerboard. Then we call initDemo, which is where it gets interesting.</p>
+<p></p>
+<p>First, we instantiate the three.js <span class="inline-code">Clock</span> object:</p>
+
+<pre><code class="language-javascript">clock = new THREE.Clock(true);</code></pre>
+
+<p>We use the clock to control the degree of motion of the three.js particle system sprites. Then we createa simple wire-frame box mesh (in red), just as a visual reference. The box is the same size as the checkerboard floor.</p>
+
+<pre><code class="language-javascript">var cubeGeometry = new THREE.BoxGeometry( 10, 10, 10 );
+var cubeMaterial = new THREE.MeshBasicMaterial( { wireframe:true, color : 0xff0000 } );
+cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+cube.position.set(0,0,0);
+gfxScene.add(cube);</code></pre>
+
+<p>First, we instantiate the three.js particle system by calling <span class="inline-code">createParticleSystem</span>, which returns the particle system &quot;mesh&quot; which we add to the scene.</p>
+
+<pre><code class="language-javascript">particleSystem = createParticleSystem();
+gfxScene.add(particleSystem);</code></pre>
+
+<p>Let's look at the code in <span class="inline-code">createParticleSystem</span>. We first set a &quot;constant&quot; that is the number of particles in the system. Then we allocate a plain geometry that will hold all the verticies which are the &quot;particles&quot;.</p>
 
 
+<pre><code class="language-javascript">var PARTICLE_COUNT = 500;
+var particles = new THREE.Geometry();</code></pre>
+
+<p>Then we create the vertices and add them to the particle's geometry. This loop creates all the vertices in a range of -20 to 20(the size of the checkerboard floor) in all directions, centered around the origin.</p>
+<pre><code class="language-javascript">for (var p = 0; p < PARTICLE_COUNT; p++) {
+    var y = Math.random() * ELEV - DELTA_ELEV;
+    var x = Math.random() * DISTRIBX - FLOOR_REPEAT * 2;
+    var z = Math.random() * DISTRIBZ - FLOOR_REPEAT * 2;
+
+	var particle = new THREE.Vector3(x, y, z);
+    particles.vertices.push(particle);
+}</code></pre>
+
+	<p>			Then we create a material  that will be used to render each vertex of the geometry. The texture we supply is a simple PNG &quot;snowflake&quot; image that is partially transparent:</p>
+	<p><img src="images/snowflake_illus.png" width="197" height="195" alt=""/></p>
+<pre><code class="language-javascript">var particleMaterial = new THREE.PointsMaterial(
+						{ color: 0xffffff,
+							size: 0.4,
+							map: THREE.ImageUtils.loadTexture("images/snowflake.png"),
+							blending: THREE.AdditiveBlending,
+							transparent: true
+						});</code></pre>
+
+<p>We make the snowflake white at 40% of its natural size and set it to be partially transparent have it blended into the scene.</p>
+<p>Finally we create the particle system and return it to be added to the scene.</p>
+<pre><code class="language-javascript">particleSystem = new THREE.Points(particles, particleMaterial);
+return particleSystem;
+</code>
+</pre>
+<p>Then we instantiate the cannon:</p>
+
+<pre><code class="language-javascript">cannon = new CANNON.Cannon( { scene : gfxScene,
+                              deltaT : 10,
+                              xLimit : FLOOR_REPEAT,
+                              zLimit : FLOOR_REPEAT});
+gfxScene.add( cannon.mesh );</code></pre>
+<p></p>
         
 <p>And that's it!  Go on to the next page to see the actual rendered demo in all it's quadric glory!</p>
 </body>

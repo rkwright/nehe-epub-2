@@ -26,9 +26,9 @@
             var DELTA_ELEV   = 10;
             var FLOOR_REPEAT = 5;
             var clock;
-            var deltaTime;
-
             var particleSystem;
+			var cannon       = null;
+			var beachBall    = null;
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [5,7.5,25],
@@ -37,10 +37,6 @@
                                             controls : true,
                                             floorRepeat : FLOOR_REPEAT,
                                             displayStats:true});
-            // globals
-            var cannon    = null;
-            var beachBall = null;
-
 			// Initialize the demo
 			initializeDemo();
 
@@ -60,33 +56,33 @@
                 cube.position.set(0,0,0);
                 gfxScene.add(cube);
 
+				particleSystem = createParticleSystem();
+				gfxScene.add(particleSystem);
+
 				cannon = new CANNON.Cannon( { scene : gfxScene,
                                               deltaT : 10,
                                               xLimit : FLOOR_REPEAT,
                                               zLimit : FLOOR_REPEAT});
 
 				gfxScene.add( cannon.mesh );
-
-				particleSystem = createParticleSystem();
-				gfxScene.add(particleSystem);
 			}
 
 			function createParticleSystem() {
 
 				// The number of particles in a particle system is not easily changed.
-				var particleCount = 250;
+				var PARTICLE_COUNT = 500;
 
 				// Particles are just individual vertices in a geometry
 				// Create the geometry that will hold all of the vertices
 				var particles = new THREE.Geometry();
 
 				// Create the vertices and add them to the particles geometry
-				for (var p = 0; p < particleCount; p++) {
+				for (var p = 0; p < PARTICLE_COUNT; p++) {
 
 					// This will create all the vertices in a range of -200 to 200 in all directions
-					var x = Math.random() * ELEV - DELTA_ELEV;
-					var y = Math.random() * DISTRIBX - DELTA_ELEV;
-					var z = Math.random() * DISTRIBZ - DELTA_ELEV;
+					var y = Math.random() * ELEV - DELTA_ELEV;
+					var x = Math.random() * DISTRIBX - FLOOR_REPEAT * 2;
+					var z = Math.random() * DISTRIBZ - FLOOR_REPEAT * 2;
 
 					// Create the vertex
 					var particle = new THREE.Vector3(x, y, z);
@@ -115,7 +111,7 @@
 			 */
 			function animateScene() {
 
-                cannon.launch();
+                cannon.launchBall();
 
                 cannon.update();
 
@@ -131,7 +127,7 @@
 			}
 
 			function animateParticles() {
-                deltaTime = clock.getDelta();
+                var deltaTime = clock.getDelta();
 
                 var verts = particleSystem.geometry.vertices;
 				for(var i = 0; i < verts.length; i++) {
@@ -140,11 +136,8 @@
 						vert.y = Math.random() * ELEV - DELTA_ELEV;
 					}
 					vert.y = vert.y - (1.0 * deltaTime);
-                    //vert.x = vert.x + (Math.random() - 0.5) * DISTRIBX * 0.001;
-				}
+ 				}
 				particleSystem.geometry.verticesNeedUpdate = true;
-
-				//particleSystem.rotation.y -= .1 * deltaTime;
 			}
 
 		]]></script>

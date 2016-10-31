@@ -86,7 +86,7 @@ CANNON.Cannon.prototype = {
      * Launch a new beachball, either by creating one or, if available,
      * fetch an existing one from the magazine
      */
-	launch: function() {
+	launchBall: function() {
         var now = performance.now();
         if ((now - this.lastT) < this.deltaT)
             return;
@@ -129,7 +129,7 @@ CANNON.Cannon.prototype = {
             ball.update();
 
             if ( (Math.abs(ball.loc.x) > this.xLimit || Math.abs(ball.loc.z) > this.zLimit) && ball.loc.y < 0) {
-                ball.mesh.material.opacity -= 0.05;
+                ball.mesh.material.opacity -= 0.025;
             }
         }
 
