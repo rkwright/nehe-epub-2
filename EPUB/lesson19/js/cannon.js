@@ -5,7 +5,7 @@
 var CANNON = { revision: '01' };
 
 // some constants
-var RHO        = 60.0 * Math.PI / 180.0;
+//var RHO        = 60.0 * Math.PI / 180.0;
 var RADIUS     = 0.5;
 
 CANNON.Cannon = function ( parameters ) {
@@ -66,7 +66,7 @@ CANNON.Cannon.prototype = {
      * Initialize all the parameters of the cannon
      */
 	init: function () {
-        this.radius = BASE_RADIUS;  // + DELTA_RADIUS * Math.random();
+        this.radius = BASE_RADIUS;
 
         var geometry = new THREE.CylinderGeometry( this.radius * 2.0,
                                                    this.radius * 3.0,
@@ -123,8 +123,6 @@ CANNON.Cannon.prototype = {
                 this.scene.remove(ball.mesh);
                 continue;
             }
-
-            //var ball = this.active[i];
 
             ball.update();
 

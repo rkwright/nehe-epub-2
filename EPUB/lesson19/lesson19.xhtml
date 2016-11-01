@@ -70,21 +70,72 @@ var particles = new THREE.Geometry();</code></pre>
 							transparent: true
 						});</code></pre>
 
-<p>We make the snowflake white at 40% of its natural size and set it to be partially transparent have it blended into the scene.</p>
-<p>Finally we create the particle system and return it to be added to the scene.</p>
+<p>We make the snowflake white at 40% of its natural size and set it to be partially transparent have it blended into the scene. Finally we create the particle system and return it to be added to the scene.</p>
+
 <pre><code class="language-javascript">particleSystem = new THREE.Points(particles, particleMaterial);
-return particleSystem;
-</code>
-</pre>
-<p>Then we instantiate the cannon:</p>
+return particleSystem;</code></pre>
+
+<p>Before we look at the other particle system, let's take a brief look at how the three.js particle system gets animated. the work gets done in <span class="inline-code">animateParticles</span>.</p>
+
+<pre><code class="language-javascript">function animateParticles() {
+    var deltaTime = clock.getDelta();            
+    var verts = particleSystem.geometry.vertices;
+    
+    for (var i = 0; i < verts.length; i++) {
+        var vert = verts[i];
+        if (vert.y < -10) {
+            vert.y = Math.random() * ELEV - DELTA_ELEV;
+        }
+		vert.y = vert.y - deltaTime;
+    }
+    particleSystem.geometry.verticesNeedUpdate = true;
+}</code></pre>
+
+
+<p>We start by fetching the &quot;deltaTime&quot;, which is the time in seconds since the animation routine was last called. This is usually about 0.016666 since the animation typically runs around 60 fps 1 second divided by 60 is ~0.016. One of the advantages of using the delta time is that it more or less automatically adjusts the rate of descent of the snowflakes so they fall at the same steady rate since the longer it has been since the last call to delta time, the farther the snowflakes drops. Since the routine is called ~60 times a second, each snowflake falls about 1 unit per second and therefore take about 5-10 seconds to fall through the lower limit (-10).</p>
+<p>Then we simply loop through all the verticies adjust the elevation by the deltaTime factor. For each vertex we check if they have already reached the bottom limit. If so, we move the vertex back up near the top. But note that the z and x coordinates are not changed so each vertex just cycles up and down in straight line.</p>
+<p>Finally, we notify three.js that we have adjust the vertex positions. Otherwise the mesh would not get updated. And that's it for the three.js particle system.</p>
+<p>So now, let's take a look at the significantly more complex home-brewed particle system. This one consists of a &quot;cannon&quot; poking up through the checkerboard floor. It fires a steady stream of colored spheres into the air, randomly altering the speed and direction of the launched &quot;beach balls&quot;. Once launched, the balls are subject to gravity and fall down to bounce across the floor until they fall off, plunging into the nether regions.</p>
+<p>So let's go through the code - there's a fair amount of it. First, we instantiate the cannon, which also manages all the beach-ballls:</p>
 
 <pre><code class="language-javascript">cannon = new CANNON.Cannon( { scene : gfxScene,
                               deltaT : 10,
                               xLimit : FLOOR_REPEAT,
                               zLimit : FLOOR_REPEAT});
 gfxScene.add( cannon.mesh );</code></pre>
+<p>The parameters are the scene itself  (since the cannon creates the beach-balls and adds them to the scene). We also pass in the size of the floor so the cannon knows when the balls have fallen off the floor. deltaT basically controls how fast the cannon tries to fire balls. Making the parameter less than 10 has little effect (at least on my MacBookPro, migh on some much faster systems). Making it larger will greatly reduce the number of balls. We'll cover this shortly.</p>
+<p>The Cannon object has the following members:</p>
+
+<pre><code class="language-javascript">this.deltaT   = 0.0;
+this.lastT    = 0.0;
+this.mesh     = null;
+this.magazine = new Array();
+this.active   = new Array();
+this.xLimit   = 0;
+this.zLimit   = 0;
+this.radius   = RADIUS;
+this.scene    = null;
+ this.ballCount = 0;</code></pre>
+ 
+<p>Most are self-explanatory, simply providing local storage. The mesh is the three.js mesh that is the cannon itself. The radius is the radius of the cannon's mouth, but also controls the length of it (10x its radius). the <span class="inline-code">magazine</span> is what it implies, it is the magazine in which the balls not currently launched are stored. Those balls that have been launched are kept in the <span class="inline-code">active</span> array. When a ball falls off the floor and into the nether regions, it is moved from the active array into the magazine and then re-launched. In this way, we don't waste memory and performance by removing and re-creating beach-balls. Each ball is created just once. <span class="inline-code">lastT</span> is the time when we last updated all the balls. As you'll see, we throttle the updates since there is no sense to updating faster than 60 fps.</p>
+<p>First, we create the cannon:</p>
+
+<pre><code class="language-javascript">this.radius = BASE_RADIUS;
+
+var geometry = new THREE.CylinderGeometry( this.radius * 2.0,
+                                                   this.radius * 3.0,
+                                                   this.radius * 10,
+                                                   32, 1, true);
+
+var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,
+                                                      specular: 0x009900,
+                                                      shininess: 30,
+                                                      side:THREE.DoubleSide});
+
+this.mesh = new THREE.Mesh( geometry, material );</code></pre>
+
 <p></p>
         
-<p>And that's it!  Go on to the next page to see the actual rendered demo in all it's quadric glory!</p>
+<p>And that's it!  Go on to the next page to see the actual rendered demo in all it's particulate glory!</p>
 </body>
 </html>
