@@ -5,7 +5,6 @@
 var CANNON = { revision: '01' };
 
 // some constants
-//var RHO        = 60.0 * Math.PI / 180.0;
 var RADIUS     = 0.5;
 
 CANNON.Cannon = function ( parameters ) {
@@ -101,11 +100,11 @@ CANNON.Cannon.prototype = {
             newBall = new BALL.BeachBall( { xLimit : this.xLimit,
                                             zLimit : this.zLimit } );
             this.ballCount++;
+            this.scene.add( newBall.mesh );
             console.log("ballcount = " + this.ballCount);
         }
 
         this.active.push( newBall );
-        this.scene.add( newBall.mesh );
 	},
 
     /**
@@ -120,7 +119,7 @@ CANNON.Cannon.prototype = {
             if (ball.mesh.material.opacity <= 0) {
                 this.active.splice(i, 1);
                 this.magazine.push( ball );
-                this.scene.remove(ball.mesh);
+                //this.scene.remove(ball.mesh);
                 continue;
             }
 
