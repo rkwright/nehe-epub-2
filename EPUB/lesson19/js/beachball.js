@@ -12,7 +12,7 @@ var BASE_VELOCITY_H = 0.025;
 var MIN_RHO         = 60.0 * Math.PI / 180.0;
 var DELTA_RHO       = 30.0 * Math.PI / 180.0;
 var BASE_RADIUS     = 0.1;
-var DELTA_RADIUS    = 0.05;
+var DELTA_RADIUS    = 0.025;
 
 BALL.BeachBall = function ( parameters ) {
 	
@@ -24,13 +24,13 @@ BALL.BeachBall = function ( parameters ) {
     this.zLimit   = 0;
     this.mesh     = null;
 
-    this.setParameters( parameters );
+    GFX.setParameters(this, parameters);
 
     this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
 
     var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );
 
-    var material = new THREE.MeshLambertMaterial( { transparent : true });
+    var material = new THREE.MeshLambertMaterial( { transparent: true });
     material.color.setRGB(Math.random(), Math.random(), Math.random());
 
     this.mesh = new THREE.Mesh( geometry, material );
@@ -89,7 +89,7 @@ BALL.BeachBall.prototype = {
         this.vel.set( velX, velY, velZ);
         this.loc.set(0, this.radius, 0);
 
-        this.mesh.material.opacity = 1.0;
+        this.mesh.material.opacity = 1;
     },
 
 
@@ -101,6 +101,7 @@ BALL.BeachBall.prototype = {
         this.loc.add( this.vel );
         this.vel.add( this.gravity );
         this.mesh.position.set(this.loc.x, this.loc.y, this.loc.z);
+
 
         if (this.loc.y < 0.0 ) {
             //console.log(" veloc: " + this.vel.x.toFixed(3) + ", " + this.vel.y.toFixed(3) + ", " + this.vel.z.toFixed(3) + ", loc: " + this.loc.x.toFixed(3) + ", " + this.loc.y.toFixed(3) + ", "+ this.loc.z.toFixed(3));

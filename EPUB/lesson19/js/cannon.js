@@ -20,7 +20,7 @@ CANNON.Cannon = function ( parameters ) {
     this.scene    = null;
     this.ballCount = 0;
 
-    this.setParameters( parameters );
+    GFX.setParameters( this, parameters );
 
     this.init();
 };
@@ -28,38 +28,6 @@ CANNON.Cannon = function ( parameters ) {
 // the scene's parameters from the values JSON object
 // lifted from MrDoob's implementation in three.js
 CANNON.Cannon.prototype = {
-		
-	setParameters: function( values ) {
-
-		if ( values === undefined ) return;
-	
-		for ( var key in values ) {
-	
-			var newValue = values[ key ];
-	
-			if ( newValue === undefined ) {
-				console.warn( "CANNON: '" + key + "' parameter is undefined." );
-				continue;
-			}
-	
-			if ( key in this ) {
-				var currentValue = this[ key ];
-	
-				if ( currentValue instanceof THREE.Color ) {
-					currentValue.set( newValue );
-				}
-                else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
-					currentValue.copy( newValue );
-				}
-                else if (currentValue instanceof Array) {
-                    this[ key ] = newValue.slice();
-				}
-                else {
-                    this[ key ] = newValue;
-                }
-			}
-		}
-	},
 
     /**
      * Initialize all the parameters of the cannon
@@ -101,17 +69,20 @@ CANNON.Cannon.prototype = {
                                             zLimit : this.zLimit } );
             this.ballCount++;
             this.scene.add( newBall.mesh );
-            console.log("ballcount = " + this.ballCount);
+            // console.log("ballcount = " + this.ballCount);
         }
 
         this.active.push( newBall );
-	},
+ 	},
 
     /**
      * Update each beachball's location by iterating through the
      * array of active balls
      */
     update: function() {
+        //console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
+
+        this.launchBall();
 
         for ( var i=this.active.length-1; i>=0; i-- ) {
             var ball = this.active[i];
@@ -122,6 +93,8 @@ CANNON.Cannon.prototype = {
                 //this.scene.remove(ball.mesh);
                 continue;
             }
+
+            //var ball = this.active[i];
 
             ball.update();
 

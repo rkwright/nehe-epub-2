@@ -19,7 +19,12 @@ GFX.Scene = function ( parameters ) {
 	this.canvasWidth = 0;
 	this.canvasHeight = 0;
 
+    this.perspective = true;
+    this.fov = 45;
+    this.near = 0.01;
+    this.far = 1000;
 	this.cameraPos = [0,20,40];
+    this.orthoSize = 1;
 
 	this.controls = false;
 	this.orbitControls = null;
@@ -43,50 +48,49 @@ GFX.Scene = function ( parameters ) {
 	this.fogNear = 0.015;
 	this.fogFar = 100;
 
-    this.setParameters( parameters );
+    GFX.setParameters( this, parameters );
 
     this.initialize();
 };
 
+GFX.setParameters= function( object, values ) {
+
+    if ( values === undefined ) return;
+
+    for ( var key in values ) {
+
+        var newValue = values[ key ];
+
+        if ( newValue === undefined ) {
+            console.warn( "GFX: '" + key + "' parameter is undefined." );
+            continue;
+        }
+
+        if ( key in object ) {
+            var currentValue = object[ key ];
+
+            if ( currentValue instanceof THREE.Color ) {
+                currentValue.set( newValue );
+            }
+            else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+                currentValue.copy( newValue );
+            }
+            else if ( key == 'overdraw' ) {
+                // ensure overdraw is backwards-compatible with legacy boolean type
+                object[ key ] = Number( newValue );
+            }
+            else if (currentValue instanceof Array) {
+                object[ key ] = newValue.slice();
+            }
+            else {
+                object[ key ] = newValue;
+            }
+        }
+    }
+}
 // the scene's parameters from the values JSON object
 // lifted from MrDoob's implementation in three.js
 GFX.Scene.prototype = {
-		
-	setParameters: function( values ) {
-
-		if ( values === undefined ) return;
-	
-		for ( var key in values ) {
-	
-			var newValue = values[ key ];
-	
-			if ( newValue === undefined ) {
-				console.warn( "NEHE: '" + key + "' parameter is undefined." );
-				continue;
-			}
-	
-			if ( key in this ) {
-				var currentValue = this[ key ];
-	
-				if ( currentValue instanceof THREE.Color ) {
-					currentValue.set( newValue );
-				}
-                else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
-					currentValue.copy( newValue );
-				}
-                else if ( key == 'overdraw' ) {
-					// ensure overdraw is backwards-compatible with legacy boolean type
-					this[ key ] = Number( newValue );
-				}
-                else if (currentValue instanceof Array) {
-                    this[ key ] = newValue.slice();
-				}
-                else {
-                    this[ key ] = newValue;
-                }
-			}
-		}
-	},
 
 	initialize: function () {
 		// Check whether the browser supports WebGL. 
@@ -109,9 +113,22 @@ GFX.Scene.prototype = {
 			window.addEventListener('resize', function() {
                 _self.canvasWidth  = window.innerWidth;
                 _self.canvasHeight = window.innerHeight;
-                _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
-                _self.camera.aspect = _self.canvasWidth / _self.canvasHeight;
+                var aspect = _self.canvasWidth / _self.canvasHeight;
+
+                if (_self.perspective == true ) {
+                    _self.camera.aspect = aspect;
+                } else {
+                    var w2 = _self.orthoSize * aspect / 2;
+                    var h2 = _self.orthoSize / 2;
+
+                    _self.camera.left   = -w2;
+                    _self.camera.right  = w2;
+                    _self.camera.top    = h2;
+                    _self.camera.bottom = -h2;
+                }
+
                 _self.camera.updateProjectionMatrix();
+                _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
             });
 		}
 	
@@ -131,13 +148,8 @@ GFX.Scene.prototype = {
 		}
 	
 		// set up the camera
-		this.camera = new THREE.PerspectiveCamera(45, this.canvasWidth / this.canvasHeight, 0.1, 5000);
-		if (this.cameraPos == undefined)
-			this.camera.position.set(0, 10, 20);
-		else
-			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+		this.setCamera(null);
 
-		this.camera.lookAt(this.scene.position);
 		this.scene.add(this.camera);
 	
 		// allocate the THREE.js renderer
@@ -169,7 +181,7 @@ GFX.Scene.prototype = {
 
 		// request the orbitControls be created and enabled
 		// add the controls
-		if (this.controls == true)
+		if (this.controls == true && this.renderer != null)
 			this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 		
 		if ( this.axesHeight != 0 )
@@ -183,7 +195,7 @@ GFX.Scene.prototype = {
 		if (this.displayStats == true) {
 			this.stats = new Stats();
 			this.stats.domElement.style.position = 'absolute';
-			this.stats.domElement.style.bottom = '10px';
+			this.stats.domElement.style.bottom = '0px';
 			this.stats.domElement.style.zIndex = 100;
 			container.appendChild( this.stats.domElement );
 		}
@@ -197,9 +209,43 @@ GFX.Scene.prototype = {
 		this.scene.remove(obj);
 	},
 
-/**
- * Render the scene. Map the 3D world to the 2D screen.
- */
+	/**
+	 * Set up the camera for the scene.  Perspective or Orthographic
+	 */
+	setCamera: function ( jsonObj ) {
+	    if (jsonObj != null)
+	        this.setParameters(jsonObj);
+
+        if (this.perspective == true)
+		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
+        else {
+
+            var aspect = this.canvasWidth / this.canvasHeight;
+            var w2 = this.orthoSize * aspect / 2;
+            var h2 = this.orthoSize / 2;
+            this.camera = new THREE.OrthographicCamera( -w2, w2, h2, -h2, 0.01, 1000);
+
+            //this.camera = new THREE.OrthographicCamera( this.canvasWidth / -2, this.canvasWidth / 2,
+            //    this.canvasHeight / 2, this.canvasHeight / -2, 0.01, 1000 );
+
+        }
+
+        this.camera.updateProjectionMatrix();
+
+        if (this.cameraPos == undefined)
+			this.camera.position.set(0, 10, 20);
+		else
+			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+
+		this.camera.lookAt(this.scene.position);
+
+        if (this.controls == true && this.renderer != null)
+            this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+    },
+
+	/**
+	 * Render the scene. Map the 3D world to the 2D screen.
+     */
 	renderScene: function() {
 		
 		this.renderer.render(this.scene, this.camera);

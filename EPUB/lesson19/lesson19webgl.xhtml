@@ -21,14 +21,11 @@
 
 		<script type="text/javascript"> <![CDATA[
             var ELEV         = 25;
-            var DISTRIBX     = 20;
-            var DISTRIBZ     = 20;
             var DELTA_ELEV   = 10;
             var FLOOR_REPEAT = 5;
             var clock;
             var particleSystem;
 			var cannon       = null;
-			var beachBall    = null;
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [5,7.5,25],
@@ -68,6 +65,8 @@
 			}
 
 			function createParticleSystem() {
+				var DISTRIBX     = 20;
+				var DISTRIBZ     = 20;
 
 				// The number of particles in a particle system is not easily changed.
 				var PARTICLE_COUNT = 500;
@@ -111,13 +110,9 @@
 			 */
 			function animateScene() {
 
-                cannon.launchBall();
-
                 cannon.update();
 
                 animateParticles();
-
-                //console.log(" veloc: " + veloc.x.toFixed(3) + ", " + veloc.y.toFixed(3) + ", " + veloc.z.toFixed(3) + ", loc: " + loc.x.toFixed(3) + ", " + loc.y.toFixed(3) + ", "+ loc.z.toFixed(3));
 
 				// Tell the browser to call this function back
 				requestAnimationFrame(animateScene);

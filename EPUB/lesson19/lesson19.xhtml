@@ -51,7 +51,7 @@ gfxScene.add(particleSystem);</code></pre>
 var particles = new THREE.Geometry();</code></pre>
 
 <p>Then we create the vertices and add them to the particle's geometry. This loop creates all the vertices in a range of -20 to 20(the size of the checkerboard floor) in all directions, centered around the origin.</p>
-<pre><code class="language-javascript">for (var p = 0; p < PARTICLE_COUNT; p++) {
+<pre><code class="language-javascript">for (var p = 0; p &lt; PARTICLE_COUNT; p++) {
     var y = Math.random() * ELEV - DELTA_ELEV;
     var x = Math.random() * DISTRIBX - FLOOR_REPEAT * 2;
     var z = Math.random() * DISTRIBZ - FLOOR_REPEAT * 2;
@@ -81,9 +81,9 @@ return particleSystem;</code></pre>
     var deltaTime = clock.getDelta();            
     var verts = particleSystem.geometry.vertices;
     
-    for (var i = 0; i < verts.length; i++) {
+    for (var i = 0; i &lt; verts.length; i++) {
         var vert = verts[i];
-        if (vert.y < -10) {
+        if (vert.y &lt; -10) {
             vert.y = Math.random() * ELEV - DELTA_ELEV;
         }
 		vert.y = vert.y - deltaTime;
