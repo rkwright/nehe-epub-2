@@ -134,8 +134,49 @@ var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,
 
 this.mesh = new THREE.Mesh( geometry, material );</code></pre>
 
-<p></p>
-        
+<p>Before we look at how the Cannon manages the balls, let's look at the balls and their &quot;physics&quot;. First we decare some constants</p>
+
+<pre><code class="language-javascript">var RESTITUTION     = 0.75;
+var SEGMENTS        = 8;
+var BASE_VELOCITY_V = 0.1;
+var BASE_VELOCITY_H = 0.025;
+var MIN_RHO         = 60.0 * Math.PI / 180.0;
+var DELTA_RHO       = 30.0 * Math.PI / 180.0;
+var BASE_RADIUS     = 0.1;
+var DELTA_RADIUS    = 0.025;</code></pre>
+
+<p>First we create some &quot;constants&quot;. Most are self-explanatory such as the base velocity horizontally and vertically, the number of segments on the sphere and the base and delta radius of the balls. <span class="inline-code">RESTITUTION</span> is the amount that the ball will rebound each time it bounces. If the ball were perfectly elastic, resititution would be 1.0. In this case, it loses 25% of its bounce each time it hits the floor.</p>
+<p>We also want the balls to come out the mouth of the cannon of course, but at different vertical angles and with some random variation. The geometry of this looks like this:</p>
+<p><img src="images/Cannon-Rho.svg" width="300" height="450" alt=""/></p>
+  
+<p>So delta Rho will vary from <span class="inline-code">90-MinRho</span> to 0.</p>
+<p>The ball's constructor is </p>
+
+<pre><code class="language-javascript">BALL.BeachBall = function ( parameters ) {
+	
+	this.gravity  = new THREE.Vector3(0, -0.002, 0);
+	this.vel      = new THREE.Vector3(0,0,0);
+	this.loc      = new THREE.Vector3(0,0,0);
+    this.radius   = 0;
+    this.xLimit   = 0;
+    this.zLimit   = 0;
+    this.mesh     = null;
+
+    GFX.setParameters(this, parameters);
+
+    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
+
+    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );
+
+    var material = new THREE.MeshLambertMaterial( { transparent: true });
+    material.color.setRGB(Math.random(), Math.random(), Math.random());
+
+    this.mesh = new THREE.Mesh( geometry, material );
+
+    this.init();
+};</code></pre>
+
+<p></p>       
 <p>And that's it!  Go on to the next page to see the actual rendered demo in all it's particulate glory!</p>
 </body>
 </html>
