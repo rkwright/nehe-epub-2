@@ -96,28 +96,66 @@ return particleSystem;</code></pre>
 <p>Then we simply loop through all the verticies adjust the elevation by the deltaTime factor. For each vertex we check if they have already reached the bottom limit. If so, we move the vertex back up near the top. But note that the z and x coordinates are not changed so each vertex just cycles up and down in straight line.</p>
 <p>Finally, we notify three.js that we have adjust the vertex positions. Otherwise the mesh would not get updated. And that's it for the three.js particle system.</p>
 <p>So now, let's take a look at the significantly more complex home-brewed particle system. This one consists of a &quot;cannon&quot; poking up through the checkerboard floor. It fires a steady stream of colored spheres into the air, randomly altering the speed and direction of the launched &quot;beach balls&quot;. Once launched, the balls are subject to gravity and fall down to bounce across the floor until they fall off, plunging into the nether regions.</p>
-<p>So let's go through the code - there's a fair amount of it. First, we instantiate the cannon, which also manages all the beach-ballls:</p>
+<p>So let's go through the code - there's a fair amount of it. First, let's take a look at the beach-balls, as they are quite simple. All the beach-balls comprise is a three.js Sphere. it's radius, and two vectors holding the location and velocity of the ball. Here is the constructor:</p>
+
+<pre><code class="language-javascript">BALL.BeachBall = function ( parameters ) {
+    var SEGMENTS        = 8;
+    var BASE_RADIUS     = 0.1;
+    var DELTA_RADIUS    = 0.025;
+    var RESTITUTION     = 0.75;
+
+    this.vel      = new THREE.Vector3(0,0,0);
+	this.loc      = new THREE.Vector3(0,0,0);
+    this.gravity  = new THREE.Vector3(0,-0.002,0);
+    this.mesh     = null;
+
+    GFX.setParameters(this, parameters);
+
+    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
+
+    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );
+
+    var material = new THREE.MeshLambertMaterial( { transparent: true });
+    material.color.setRGB(Math.random(), Math.random(), Math.random());
+
+    this.mesh = new THREE.Mesh( geometry, material );
+
+    this.restitution = RESTITUTION;
+};</code></pre>
+
+<p>Most of this is self-explanatory such as velocity and location, the number of segments on the sphere and the base and delta radius of the balls. <span class="inline-code">RESTITUTION</span> is the amount that the ball will rebound each time it bounces. If the ball were perfectly elastic, resititution would be 1.0. In this case, it loses 25% of its bounce each time it hits the floor.So the bouncing looks like this:</p>
+
+<p><img src="images/Restitution.svg" width="400" alt="beachball restitution"/></p>
+
+<p>The update function for the beach-ball is pretty simple since all it does is update the location with the current velocity then update the velocity with the gravitational pull and then update the mesh's position:</p>
+
+<pre><code class="language-javascript">update: function() {
+    this.loc.add( this.vel );
+    this.vel.add( this.gravity );
+    this.mesh.position.set(this.loc.x, this.loc.y, this.loc.z);
+}</code></pre>
+    
+<p>The cannon is more complex since it both launches and manages all the beach-balls. First, we instantiate the cannon itself:</p>
 
 <pre><code class="language-javascript">cannon = new CANNON.Cannon( { scene : gfxScene,
                               deltaT : 10,
                               xLimit : FLOOR_REPEAT,
                               zLimit : FLOOR_REPEAT});
 gfxScene.add( cannon.mesh );</code></pre>
-<p>The parameters are the scene itself  (since the cannon creates the beach-balls and adds them to the scene). We also pass in the size of the floor so the cannon knows when the balls have fallen off the floor. deltaT basically controls how fast the cannon tries to fire balls. Making the parameter less than 10 has little effect (at least on my MacBookPro, migh on some much faster systems). Making it larger will greatly reduce the number of balls. We'll cover this shortly.</p>
+<p>The parameters are the scene itself  (since the cannon creates the beach-balls and adds them to the scene). We also pass in the size of the floor so the cannon knows when the balls have fallen off the floor. <span class="inline-code">deltaT</span> basically controls how fast the cannon tries to fire balls. Making the parameter less than 10 has little effect  since the code will only launch one ball per frame no matter how fast the computer. Making it larger will greatly reduce the number of balls since the cannon won't launch a ball at every frame. We'll cover this shortly.</p>
 <p>The Cannon object has the following members:</p>
 
 <pre><code class="language-javascript">this.deltaT   = 0.0;
 this.lastT    = 0.0;
 this.mesh     = null;
-this.magazine = new Array();
-this.active   = new Array();
+this.magazine = [];
+this.active   = [];
 this.xLimit   = 0;
 this.zLimit   = 0;
-this.radius   = RADIUS;
-this.scene    = null;
- this.ballCount = 0;</code></pre>
+this.scene    = null;</code>
  
-<p>Most are self-explanatory, simply providing local storage. The mesh is the three.js mesh that is the cannon itself. The radius is the radius of the cannon's mouth, but also controls the length of it (10x its radius). the <span class="inline-code">magazine</span> is what it implies, it is the magazine in which the balls not currently launched are stored. Those balls that have been launched are kept in the <span class="inline-code">active</span> array. When a ball falls off the floor and into the nether regions, it is moved from the active array into the magazine and then re-launched. In this way, we don't waste memory and performance by removing and re-creating beach-balls. Each ball is created just once. <span class="inline-code">lastT</span> is the time when we last updated all the balls. As you'll see, we throttle the updates since there is no sense to updating faster than 60 fps.</p>
+</pre>
+<p>Most are self-explanatory, simply providing local storage. The mesh  is the cannon itself.  The <span class="inline-code">magazine</span> is what it implies,  the magazine in which the balls not currently launched are stored. Those balls that have been launched are kept in the <span class="inline-code">active</span> array. When a ball falls off the floor and into the nether regions, it is moved from the active array into the <span class="inline-code">magazine</span>. When a new ball is needed and the magazine is empty one is created. If there is one in the magazine, it is just popped out and re-used. In this way, we don't waste memory and performance by removing and re-creating beach-balls. Each ball is created just once. <span class="inline-code">lastT</span> is the time when we last updated all the balls. As you'll see, we throttle the updates since there is no sense to updating faster than 60 fps.</p>
 <p>First, we create the cannon:</p>
 
 <pre><code class="language-javascript">this.radius = BASE_RADIUS;
@@ -147,6 +185,7 @@ var DELTA_RADIUS    = 0.025;</code></pre>
 
 <p>First we create some &quot;constants&quot;. Most are self-explanatory such as the base velocity horizontally and vertically, the number of segments on the sphere and the base and delta radius of the balls. <span class="inline-code">RESTITUTION</span> is the amount that the ball will rebound each time it bounces. If the ball were perfectly elastic, resititution would be 1.0. In this case, it loses 25% of its bounce each time it hits the floor.</p>
 <p>We also want the balls to come out the mouth of the cannon of course, but at different vertical angles and with some random variation. The geometry of this looks like this:</p>
+
 <p><img src="images/Cannon-Rho.svg" width="300" height="450" alt=""/></p>
   
 <p>So delta Rho will vary from <span class="inline-code">90-MinRho</span> to 0.</p>

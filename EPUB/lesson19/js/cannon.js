@@ -5,7 +5,8 @@
 var CANNON = { revision: '02' };
 
 // some constants
-var RADIUS          = 0.5;
+var BARREL_RADIUS   = 0.1;
+var BARREL_LENGTH   = 1.0;
 var BASE_VELOCITY_V = 0.1;
 var BASE_VELOCITY_H = 0.025;
 var MIN_RHO         = 60.0 * Math.PI / 180.0;
@@ -16,13 +17,11 @@ CANNON.Cannon = function ( parameters ) {
 	this.deltaT   = 0.0;
     this.lastT    = 0.0;
     this.mesh     = null;
-    this.magazine = new Array();
-    this.active   = new Array();
+    this.magazine = [];
+    this.active   = [];
     this.xLimit   = 0;
     this.zLimit   = 0;
-    this.radius   = RADIUS;
     this.scene    = null;
-    this.ballCount = 0;
     this.gravity  = new THREE.Vector3(0, -0.002, 0);
 
     GFX.setParameters( this, parameters );
@@ -37,11 +36,10 @@ CANNON.Cannon.prototype = {
      * Initialize all the parameters of the cannon
      */
 	init: function () {
-        this.radius = BASE_RADIUS;
 
-        var geometry = new THREE.CylinderGeometry( this.radius * 2.0,
-                                                   this.radius * 3.0,
-                                                   this.radius * 10,
+        var geometry = new THREE.CylinderGeometry( BARREL_RADIUS * 2.0,
+                                                   BARREL_RADIUS * 3.0,
+                                                   BARREL_LENGTH,
                                                    32, 1, true);
 
         var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,
@@ -65,7 +63,7 @@ CANNON.Cannon.prototype = {
         var velY = Math.sin(rho) * BASE_VELOCITY_V;
 
         ball.vel.set( velX, velY, velZ);
-        ball.loc.set(0, this.radius, 0);
+        ball.loc.set(0, ball.radius, 0);
 
         ball.mesh.material.opacity = 1;
     },
@@ -85,10 +83,8 @@ CANNON.Cannon.prototype = {
             newBall = this.magazine.pop();
         }
         else {
-            newBall = new BALL.BeachBall( {  } );
-            this.ballCount++;
+            newBall = new BALL.BeachBall( { gravity : this.gravity } );
             this.scene.add( newBall.mesh );
-            // console.log("ballcount = " + this.ballCount);
         }
 
         this.initBall( newBall );
@@ -115,9 +111,7 @@ CANNON.Cannon.prototype = {
                 continue;
             }
 
-            //var ball = this.active[i];
-
-            ball.update(this.gravity);
+            ball.update();
 
             if (ball.loc.y < 0.0 ) {
                 //console.log(" veloc: " + ball.vel.x.toFixed(3) + ", " + ball.vel.y.toFixed(3) +
