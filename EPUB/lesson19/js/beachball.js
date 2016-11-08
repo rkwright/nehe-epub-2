@@ -5,8 +5,8 @@
 var BALL = { revision: '02' };
 
 
-
 BALL.BeachBall = function ( parameters ) {
+
     var SEGMENTS        = 8;
     var BASE_RADIUS     = 0.1;
     var DELTA_RADIUS    = 0.025;

@@ -4,13 +4,6 @@
 
 var CANNON = { revision: '02' };
 
-// some constants
-var BARREL_RADIUS   = 0.1;
-var BARREL_LENGTH   = 1.0;
-var BASE_VELOCITY_V = 0.1;
-var BASE_VELOCITY_H = 0.025;
-var MIN_RHO         = 60.0 * Math.PI / 180.0;
-var DELTA_RHO       = 30.0 * Math.PI / 180.0;
 
 CANNON.Cannon = function ( parameters ) {
 	
@@ -26,7 +19,7 @@ CANNON.Cannon = function ( parameters ) {
 
     GFX.setParameters( this, parameters );
 
-    this.init();
+    this.initCannon();
 };
 
 
@@ -35,7 +28,10 @@ CANNON.Cannon.prototype = {
     /**
      * Initialize all the parameters of the cannon
      */
-	init: function () {
+	initCannon: function () {
+
+        var BARREL_RADIUS   = 0.1;
+        var BARREL_LENGTH   = 1.0;
 
         var geometry = new THREE.CylinderGeometry( BARREL_RADIUS * 2.0,
                                                    BARREL_RADIUS * 3.0,
@@ -51,9 +47,14 @@ CANNON.Cannon.prototype = {
     },
 
     /**
-     * Initialize all the parameters of the beachball
+     * Initialize all the trajectory and velocity of the beachball
      */
-    initBall: function ( ball ) {
+    initTrajectory: function ( ball ) {
+
+        var BASE_VELOCITY_V = 0.1;
+        var BASE_VELOCITY_H = 0.025;
+        var MIN_RHO         = 60.0 * Math.PI / 180.0;
+        var DELTA_RHO       = 30.0 * Math.PI / 180.0;
 
         var theta = Math.PI * 2.0 * Math.random();
         var velX = Math.sin(theta) * BASE_VELOCITY_H;
@@ -69,11 +70,12 @@ CANNON.Cannon.prototype = {
     },
 
     /**
-     * Launch a new beachball, either by creating one or, if available,
-     * fetch an existing one from the magazine
+     * Fire a new beachball, either by fetching an existing one from the magazine
+     * else create a new one
      */
-	launchBall: function() {
-        var now = performance.now();
+	fireCannon: function() {
+
+        var now = Performance.now();
         if ((now - this.lastT) < this.deltaT)
             return;
         this.lastT = now;
@@ -87,10 +89,11 @@ CANNON.Cannon.prototype = {
             this.scene.add( newBall.mesh );
         }
 
-        this.initBall( newBall );
+        this.initTrajectory( newBall );
 
         this.active.push( newBall );
  	},
+
 
     /**
      * Update each beachball's location by iterating through the
@@ -99,32 +102,31 @@ CANNON.Cannon.prototype = {
     update: function() {
         //console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
 
-        this.launchBall();
+        this.fireCannon();
 
         for ( var i=this.active.length-1; i>=0; i-- ) {
+            
             var ball = this.active[i];
 
+            // if ball is now transparent, move it from active to magazine
             if (ball.mesh.material.opacity <= 0) {
                 this.active.splice(i, 1);
                 this.magazine.push( ball );
-                //this.scene.remove(ball.mesh);
-                continue;
             }
+            else {
 
-            ball.update();
+                ball.update();
 
-            if (ball.loc.y < 0.0 ) {
-                //console.log(" veloc: " + ball.vel.x.toFixed(3) + ", " + ball.vel.y.toFixed(3) +
-                //   ", " + ball.vel.z.toFixed(3) + ", loc: " + ball.loc.x.toFixed(3) + ", " +
-                // ball.loc.y.toFixed(3) + ", "+ ball.loc.z.toFixed(3));
+                if (ball.loc.y < 0.0) {
 
-                if (Math.abs(ball.loc.x) <= this.xLimit && Math.abs(ball.loc.z) <= this.zLimit) {
-                    ball.vel.y = -ball.vel.y * ball.restitution;
-                    ball.loc.y = ball.radius;
-                }
-
-                if ( (Math.abs(ball.loc.x) > this.xLimit || Math.abs(ball.loc.z) > this.zLimit) && ball.loc.y < 0) {
-                    ball.mesh.material.opacity -= 0.025;
+                    // If the ball is still on the floor, make it bounce
+                    if (Math.abs(ball.loc.x) <= this.xLimit && Math.abs(ball.loc.z) <= this.zLimit) {
+                        ball.vel.y = -ball.vel.y * ball.restitution;
+                        ball.loc.y = ball.radius;
+                    }
+                    else { // reduce the opacity incrementally
+                        ball.mesh.material.opacity -= 0.025;
+                    }
                 }
             }
         }
