@@ -105,7 +105,7 @@ CANNON.Cannon.prototype = {
         this.fireCannon();
 
         for ( var i=this.active.length-1; i>=0; i-- ) {
-            
+
             var ball = this.active[i];
 
             // if ball is now transparent, move it from active to magazine
@@ -119,7 +119,7 @@ CANNON.Cannon.prototype = {
 
                 if (ball.loc.y < 0.0) {
 
-                    // If the ball is still on the floor, make it bounce
+                    // If the ball is still over the floor, make it bounce
                     if (Math.abs(ball.loc.x) <= this.xLimit && Math.abs(ball.loc.z) <= this.zLimit) {
                         ball.vel.y = -ball.vel.y * ball.restitution;
                         ball.loc.y = ball.radius;
