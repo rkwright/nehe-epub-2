@@ -156,9 +156,9 @@ We'll cover this shortly.</p>
 <p>Most are self-explanatory, simply providing local storage. The mesh  is the cannon itself.  The <span class="inline-code">magazine</span>
 is what it implies, the magazine in which the balls not currently
 launched are stored. Those balls that have been launched are kept in
-the <span class="inline-code">active</span> array. When a ball falls off the floor and into the nether regions, it is moved from the active array into the <span class="inline-code">magazine</span>.
-When a new ball is needed and the magazine is empty one is created. If
-there is one in the magazine, it is just popped out and re-used. In
+the <span class="inline-code">active</span> array. When a ball falls off the floor and into the nether regions, it is moved from the <span class="inline-code">active</span> array into the <span class="inline-code">magazine</span>.
+When a new ball is needed and the <span class="inline-code">magazine</span> is empty one is created. If
+there is one in the <span class="inline-code">magazine</span>, it is just popped out and re-used. In
 this way, we don't waste memory and performance by removing and
 re-creating beach-balls. Each ball is created just once. <span class="inline-code">lastT</span>
 is the time when we last updated all the balls. As you'll see, we
@@ -169,6 +169,64 @@ fps.</p>
 
 <pre><code class="language-javascript">var geometry = new THREE.CylinderGeometry( BASE_RADIUS<br>                                                   BASE_RADIUS * 3.0,<br>                                                   BARREL_LENGTH,<br>                                                   32, 1, true);<br><br>var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,<br>                                                      specular: 0x009900,<br>                                                      shininess: 30,<br>                                                      side:THREE.DoubleSide});<br><br>this.mesh = new THREE.Mesh( geometry, material );</code></pre>
 
+<p>Now, let's look at the update method for the cannon, which is called from the animate() method in the lesson19. It's pretty simple, it first calls <span class="inline-code">fireCannon()</span> then <span class="inline-code">updateBalls().</span></p>
+
+<pre><code class="language-javascript">update: function() {
+    this.fireCannon();
+	this.updateBalls();
+}</code></pre>
+
+<p>The method <span class="inline-code">fireCannon()</span> is relatively simple, but has a couple of interesting aspects:</p>
+
+<pre><code class="language-javascript">fireCannon : function {
+    var now = Performance.now();
+
+    if ((now - this.lastT) < this.deltaT)
+        return;
+    this.lastT = now;
+
+    var newBall;
+    if (this.magazine.length > 0) {
+        newBall = this.magazine.pop();
+    else {
+        newBall = new BALL.BeachBall( { gravity : this.gravity    } );
+        this.scene.add( newBall.mesh );
+    }
+
+   this.initTrajectory( newBall );
+
+   this.active.push( newBall );
+}</code></pre>
+
+<p>The first step is to see if the delay since the last firing is long enough, i.e. longer than deltaT. If not, we just return. If has been long enough (which is usually the case), we need to fire the cannon. To do this, we first check if there is already one or more balls in the magazine. If so, we just pop one out of the magazine. If the magazine is empty (which is only true in the first few seconds of the demo, we need to allocate a brand new beach ball and add it to the scene.</p>
+<p>Then we initialize the trajectory of the beach-ball, i.e. we &quot;fire&quot; the beach-ball. Finally, we push the newly fired beach ball into the active array.</p>
+<pre><code class="language-javascript">for ( var i=this.active.length-1; i>=0; i-- ) {
+
+    var ball = this.active[i];
+
+    if (ball.mesh.material.opacity <= 0) {
+        this.active.splice(i, 1);
+        this.magazine.push( ball );
+    }
+    else {
+        ball.update();
+
+        if (ball.loc.y < 0.0) {
+                
+            if (Math.abs(ball.loc.x) <= this.xLimit && Math.abs(ball.loc.z) <= this.zLimit) {
+                ball.vel.y = -ball.vel.y * ball.restitution;
+                ball.loc.y = ball.radius;
+            }
+            else { 
+                ball.mesh.material.opacity -= 0.025;
+            }
+        }
+    }
+}</code></pre>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 <p>Before we look at how the Cannon manages the balls, let's look at the balls and their "physics". First we decare some constants</p>
 
 <pre><code class="language-javascript">var RESTITUTION     = 0.75;<br>var SEGMENTS        = 8;<br>var BASE_VELOCITY_V = 0.1;<br>var BASE_VELOCITY_H = 0.025;<br>var MIN_RHO         = 60.0 * Math.PI / 180.0;<br>var DELTA_RHO       = 30.0 * Math.PI / 180.0;<br>var BASE_RADIUS     = 0.1;<br>var DELTA_RADIUS    = 0.025;</code></pre>

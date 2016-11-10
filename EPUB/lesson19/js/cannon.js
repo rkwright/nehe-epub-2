@@ -95,23 +95,15 @@ CANNON.Cannon.prototype = {
  	},
 
 
-    /**
-     * Update each beachball's location by iterating through the
-     * array of active balls
-     */
-    update: function() {
-        //console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
-
-        this.fireCannon();
-
-        for ( var i=this.active.length-1; i>=0; i-- ) {
+    updateBalls: function () {
+        for (var i = this.active.length - 1; i >= 0; i--) {
 
             var ball = this.active[i];
 
             // if ball is now transparent, move it from active to magazine
             if (ball.mesh.material.opacity <= 0) {
                 this.active.splice(i, 1);
-                this.magazine.push( ball );
+                this.magazine.push(ball);
             }
             else {
 
@@ -130,6 +122,18 @@ CANNON.Cannon.prototype = {
                 }
             }
         }
+    },
+
+    /**
+     * Update each beachball's location by iterating through the
+     * array of active balls
+     */
+    update: function() {
+        //console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
+
+        this.fireCannon();
+
+        this.updateBalls();
 
     }
 };
