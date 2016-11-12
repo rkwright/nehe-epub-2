@@ -75,7 +75,7 @@ CANNON.Cannon.prototype = {
      */
 	fireCannon: function() {
 
-        var now = Performance.now();
+        var now = performance.now();
         if ((now - this.lastT) < this.deltaT)
             return;
         this.lastT = now;
