@@ -109,7 +109,7 @@ CANNON.Cannon.prototype = {
 
                 ball.update();
 
-                if (ball.loc.y < 0.0) {
+                if (ball.loc.y < ball.radius) {
 
                     // If the ball is still over the floor, make it bounce
                     if (Math.abs(ball.loc.x) <= this.xLimit && Math.abs(ball.loc.z) <= this.zLimit) {

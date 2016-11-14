@@ -167,7 +167,7 @@ fps.</p>
 <p>First, we create the cannon:<br>
 </p>
 
-<pre><code class="language-javascript">var geometry = new THREE.CylinderGeometry( BASE_RADIUS<br>                                                   BASE_RADIUS * 3.0,<br>                                                   BARREL_LENGTH,<br>                                                   32, 1, true);<br><br>var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,<br>                                                      specular: 0x009900,<br>                                                      shininess: 30,<br>                                                      side:THREE.DoubleSide});<br><br>this.mesh = new THREE.Mesh( geometry, material );</code></pre>
+<pre><code class="language-javascript">var geometry = new THREE.CylinderGeometry( BASE_RADIUS * 2.0<br>                                           BASE_RADIUS * 3.0,<br>                                           BARREL_LENGTH,<br>                                           32, 1, true);<br><br>var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,<br>                                                      specular: 0x009900,<br>                                                      shininess: 30,<br>                                                      side:THREE.DoubleSide});<br><br>this.mesh = new THREE.Mesh( geometry, material );</code></pre>
 
 <p>Now, let's look at the update method for the cannon, which is called from the animate() method in the lesson19. It's pretty simple, it first calls <span class="inline-code">fireCannon()</span> then <span class="inline-code">updateBalls().</span></p>
 
@@ -198,9 +198,32 @@ fps.</p>
    this.active.push( newBall );
 }</code></pre>
 
-<p>The first step is to see if the delay since the last firing is long enough, i.e. longer than deltaT. If not, we just return. If has been long enough (which is usually the case), we need to fire the cannon. To do this, we first check if there is already one or more balls in the magazine. If so, we just pop one out of the magazine. If the magazine is empty (which is only true in the first few seconds of the demo, we need to allocate a brand new beach ball and add it to the scene.</p>
-<p>Then we initialize the trajectory of the beach-ball, i.e. we &quot;fire&quot; the beach-ball. Finally, we push the newly fired beach ball into the active array.</p>
-<pre><code class="language-javascript">for ( var i=this.active.length-1; i>=0; i-- ) {
+<p>The first step is to see if the delay since the last firing is long enough, i.e. longer than <span class="inline-code">deltaT</span>. If not, we just return. If has been long enough (which is usually the case), we need to fire the cannon. To do this, we first check if there is already one or more balls in the <span class="inline-code">magazine</span>. If so, we just pop one out of the <span class="inline-code">magazine</span>. If the <span class="inline-code">magazine</span> is empty (which is only true in the first few seconds of the demo) we need to allocate a brand new beach ball and add it to the scene.</p>
+<p>Then we initialize the trajectory of the beach-ball, i.e. we &quot;fire&quot; the beach-ball. </p>
+
+<pre><code class="language-javascript">initTrajectory: function ( ball ) {
+    var BASE_VELOCITY_V = 0.1;
+    var BASE_VELOCITY_H = 0.025;
+    var MIN_RHO         = 60.0 * Math.PI / 180.0;
+    var DELTA_RHO       = 30.0 * Math.PI / 180.0;
+
+    var theta = Math.PI * 2.0 * Math.random();
+    var velX = Math.sin(theta) * BASE_VELOCITY_H;
+    var velZ = Math.cos(theta) * BASE_VELOCITY_H;
+
+    var rho = MIN_RHO + DELTA_RHO * Math.random();
+    var velY = Math.sin(rho) * BASE_VELOCITY_V;
+
+    ball.vel.set( velX, velY, velZ);
+    ball.loc.set(0, ball.radius, 0);
+
+    ball.mesh.material.opacity = 1;
+}</code></pre>
+
+<p>This is pretty straightforward. The trajectory of the </p>
+<p>Finally, we push the newly fired beach ball into the active array.</p>
+<pre><code class="language-javascript">
+for ( var i=this.active.length-1; i>=0; i-- ) {
 
     var ball = this.active[i];
 
