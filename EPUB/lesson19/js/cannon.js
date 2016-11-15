@@ -2,7 +2,7 @@
  *  @author rkwright   /  http://www.geofx.com
  */
 
-var CANNON = { revision: '02' };
+var CANNON = { revision: '03' };
 
 
 CANNON.Cannon = function ( parameters ) {
@@ -51,20 +51,20 @@ CANNON.Cannon.prototype = {
      */
     initTrajectory: function ( ball ) {
 
-        var BASE_VELOCITY_V = 0.1;
-        var BASE_VELOCITY_H = 0.025;
-        var MIN_RHO         = 60.0 * Math.PI / 180.0;
+        var MUZZLE_VELOCITY = 0.125;
+        var MIN_RHO         = 45.0 * Math.PI / 180.0;
         var DELTA_RHO       = 30.0 * Math.PI / 180.0;
 
-        var theta = Math.PI * 2.0 * Math.random();
-        var velX = Math.sin(theta) * BASE_VELOCITY_H;
-        var velZ = Math.cos(theta) * BASE_VELOCITY_H;
-
         var rho = MIN_RHO + DELTA_RHO * Math.random();
-        var velY = Math.sin(rho) * BASE_VELOCITY_V;
+        var velY = Math.sin(rho) * MUZZLE_VELOCITY;
+        var velH = MUZZLE_VELOCITY - velY;
+
+        var theta = Math.PI * 2.0 * Math.random();
+        var velX = Math.sin(theta) * velH;
+        var velZ = Math.cos(theta) * velH;
 
         ball.vel.set( velX, velY, velZ);
-        ball.loc.set(0, ball.radius, 0);
+        ball.loc.set(0,ball.radius, 0);
 
         ball.mesh.material.opacity = 1;
     },

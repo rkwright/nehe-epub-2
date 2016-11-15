@@ -33,7 +33,13 @@ still be performant, our own particle engine will bog down with a far
 smaller number of particles.</p>
 <p>We initialize the gfxScene object same as always. We also declare some global vars:</p>
 
-<pre><code class="language-javascript">var ELEV         = 25;<br>var DELTA_ELEV   = 10;<br>var FLOOR_REPEAT = 5;<br>var clock;<br>var particleSystem;		<br>var cannon       = null;<br>var beachBall    = null;</code></pre>
+<pre><code class="language-javascript">var ELEV         = 25;
+var DELTA_ELEV   = 10;
+var FLOOR_REPEAT = 5;
+var clock;
+var particleSystem;
+var cannon       = null;
+var beachBall    = null;</code></pre>
 
 <p>We'll go over what each of these is for as we go along. Next step is
 to instantiate the scene, which is pretty standard. We do specify a
@@ -49,11 +55,16 @@ particle system sprites. Then we createa simple wire-frame box mesh (in
 red), just as a visual reference. The box is the same size as the
 checkerboard floor.</p>
 
-<pre><code class="language-javascript">var cubeGeometry = new THREE.BoxGeometry( 10, 10, 10 );<br>var cubeMaterial = new THREE.MeshBasicMaterial( { wireframe:true, color : 0xff0000 } );<br>cube = new THREE.Mesh( cubeGeometry, cubeMaterial );<br>cube.position.set(0,0,0);<br>gfxScene.add(cube);</code></pre>
+<pre><code class="language-javascript">var cubeGeometry = new THREE.BoxGeometry( 10, 10, 10 );
+var cubeMaterial = new THREE.MeshBasicMaterial( { wireframe:true, color : 0xff0000 } );
+cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+cube.position.set(0,0,0);
+gfxScene.add(cube);</code></pre>
 
 <p>First, we instantiate the three.js particle system by calling <span class="inline-code">createParticleSystem</span>, which returns the particle system "mesh" which we add to the scene.</p>
 
-<pre><code class="language-javascript">particleSystem = createParticleSystem();<br>gfxScene.add(particleSystem);</code></pre>
+<pre><code class="language-javascript">particleSystem = createParticleSystem();
+gfxScene.add(particleSystem);</code></pre>
 
 <p>Let's look at the code in <span class="inline-code">createParticleSystem</span>.
 We first set a "constant" that is the number of particles in the
@@ -61,31 +72,60 @@ system. Then we allocate a plain geometry that will hold all the
 verticies which are the "particles".</p>
 
 
-<pre><code class="language-javascript">var PARTICLE_COUNT = 500;<br>var particles = new THREE.Geometry();</code></pre>
+<pre><code class="language-javascript">var PARTICLE_COUNT = 500;
+var particles = new THREE.Geometry();</code></pre>
 
 <p>Then we create the vertices and add them to the particle's geometry.
 This loop creates all the vertices in a range of -20 to 20 (the size of
 the checkerboard floor) in all directions, centered around the origin.</p>
-<pre><code xmlns="http://www.w3.org/1999/xhtml" class="language-javascript">var DISTRIBX     = 20;<br>var DISTRIBZ     = 20;<br><br>for (var p = 0; p &lt; PARTICLE_COUNT; p++) {<br>    var y = Math.random() * ELEV - DELTA_ELEV;<br>    var x = Math.random() * DISTRIBX - FLOOR_REPEAT * 2;<br>    var z = Math.random() * DISTRIBZ - FLOOR_REPEAT * 2;<br><br>    var particle = new THREE.Vector3(x, y, z);<br>    particles.vertices.push(particle);<br>}</code></pre>
+<pre><code xmlns="http://www.w3.org/1999/xhtml" class="language-javascript">var DISTRIBX     = 20;
+var DISTRIBZ     = 20;
+for (var p = 0; p &lt; PARTICLE_COUNT; p++) {
+    var y = Math.random() * ELEV - DELTA_ELEV;
+    var x = Math.random() * DISTRIBX - FLOOR_REPEAT * 2;
+    var z = Math.random() * DISTRIBZ - FLOOR_REPEAT * 2;
+	    
+    var particle = new THREE.Vector3(x, y, z);
+    particles.vertices.push(particle);
+}</code></pre>
 
-	<p>
+<p>
 Then we create a material that will be used to render each vertex of
 the geometry. The texture we supply is a simple PNG "snowflake" image
 that is partially transparent:</p>
 	<p><img alt="" src="images/snowflake_illus.png" height="195" width="197"></p>
-<pre><code class="language-javascript">var particleMaterial = new THREE.PointsMaterial(<br>						{ color: 0xffffff,<br>							size: 0.4,<br>							map: THREE.ImageUtils.loadTexture("images/snowflake.png"),<br>							blending: THREE.AdditiveBlending,<br>							transparent: true<br>						});</code></pre>
+	
+<pre><code class="language-javascript">var particleMaterial = new THREE.PointsMaterial({ 
+    color: 0xffffff,
+    size: 0.4,
+    map: THREE.ImageUtils.loadTexture("images/snowflake.png"),
+    blending: THREE.AdditiveBlending,							transparent: true
+    });</code></pre>
 
 <p>We make the snowflake white at 40% of its natural size and set it to
 be partially transparent have it blended into the scene. Finally we
 create the particle system and return it to be added to the scene.</p>
 
-<pre><code class="language-javascript">particleSystem = new THREE.Points(particles, particleMaterial);<br>return particleSystem;</code></pre>
+<pre><code class="language-javascript">particleSystem = new THREE.Points(particles, particleMaterial);return particleSystem;</code></pre>
 
 <p>Before we look at the other particle system, let's take a brief look
 at how the three.js particle system gets animated. the work gets done
 in <span class="inline-code">animateParticles</span>.</p>
 
-<pre><code class="language-javascript">function animateParticles() {<br>    var deltaTime = clock.getDelta();            <br>    var verts = particleSystem.geometry.vertices;<br>    <br>    for (var i = 0; i &lt; verts.length; i++) {<br>        var vert = verts[i];<br>        if (vert.y &lt; -10) {<br>            vert.y = Math.random() * ELEV - DELTA_ELEV;<br>        }<br>		vert.y = vert.y - deltaTime;<br>    }<br>    particleSystem.geometry.verticesNeedUpdate = true;<br>}</code></pre>
+<pre><code class="language-javascript">function animateParticles() {
+    var deltaTime = clock.getDelta();            
+    var verts = particleSystem.geometry.vertices;
+    
+    for (var i = 0; i &lt; verts.length; i++) {
+        var vert = verts[i];
+        if (vert.y &lt; -10) {
+            vert.y = Math.random() * ELEV - DELTA_ELEV;
+        }
+        
+        vert.y = vert.y - deltaTime;
+    }
+    particleSystem.geometry.verticesNeedUpdate = true;
+}</code></pre>
 
 
 <p>We start by fetching the "deltaTime", which is the time in seconds
@@ -115,11 +155,31 @@ and fall down to bounce across the floor until they fall off, plunging
 into the nether regions.</p>
 <p>So let's go through the code - there's a fair amount of it. First,
 let's take a look at the beach-balls, as they are quite simple. All the
-beach-balls consist of is a three.js Sphere. it's radius, and two
+beach-balls consist of  a three.js Sphere, it's radius, and two
 vectors holding the location and velocity of the ball. Here is the
 constructor:</p>
 
-<pre><code class="language-javascript">BALL.BeachBall = function ( parameters ) {<br>    var SEGMENTS        = 8;<br>    var BASE_RADIUS     = 0.1;<br>    var DELTA_RADIUS    = 0.025;<br>    var RESTITUTION     = 0.75;<br><br>    this.vel      = new THREE.Vector3(0,0,0);<br>    this.loc      = new THREE.Vector3(0,0,0);<br>    this.gravity  = new THREE.Vector3(0,-0.002,0);<br>    this.mesh     = null;<br><br>    GFX.setParameters(this, parameters);<br><br>    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();<br><br>    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );<br><br>    var material = new THREE.MeshLambertMaterial( { transparent: true });<br>    material.color.setRGB(Math.random(), Math.random(), Math.random());<br><br>    this.mesh = new THREE.Mesh( geometry, material );<br><br>    this.restitution = RESTITUTION;<br>};</code></pre>
+<pre><code class="language-javascript">BALL.BeachBall = function ( parameters ) {
+    var SEGMENTS        = 8;
+    var BASE_RADIUS     = 0.1;
+    var DELTA_RADIUS    = 0.025;
+    var RESTITUTION     = 0.75;
+    
+    this.vel      = new THREE.Vector3(0,0,0);
+    this.loc      = new THREE.Vector3(0,0,0);
+    this.gravity  = new THREE.Vector3(0,-0.002,0);
+    this.mesh     = null;
+    
+    GFX.setParameters(this, parameters);
+    
+    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
+    
+    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );
+    var material = new THREE.MeshLambertMaterial( { transparent: true });
+    material.color.setRGB(Math.random(), Math.random(), Math.random());
+    
+    this.mesh = new THREE.Mesh( geometry, material );    this.restitution = RESTITUTION;
+};</code></pre>
 
 <p>Most of this is self-explanatory such as velocity and location, the
 number of segments on the sphere and the base and delta radius of the
@@ -136,11 +196,23 @@ does is update the location using the current velocity then update the
 velocity with the gravitational pull and finally updates the mesh's
 position:</p>
 
-<pre><code class="language-javascript">update: function() {<br>    this.loc.add( this.vel );<br>    this.vel.add( this.gravity );<br>    this.mesh.position.set(this.loc.x, this.loc.y, this.loc.z);<br>}</code></pre>
+<pre><code class="language-javascript">update: function() {
+    this.loc.add( this.vel );
+    this.vel.add( this.gravity );
+    this.mesh.position.set(this.loc.x, this.loc.y, this.loc.z);
+}</code></pre>
     
 <p>The cannon is more complex since it both launches and manages all the beach-balls. First, we instantiate the cannon itself:</p>
 
-<pre><code class="language-javascript">cannon = new CANNON.Cannon( { scene : gfxScene,<br>                              deltaT : 10,<br>                              xLimit : FLOOR_REPEAT,<br>                              zLimit : FLOOR_REPEAT});<br>gfxScene.add( cannon.mesh );</code></pre>
+<pre><code class="language-javascript">cannon = new CANNON.Cannon( {
+    scene : gfxScene,
+    deltaT : 10,
+    xLimit : FLOOR_REPEAT,
+    zLimit : FLOOR_REPEAT
+});
+    
+gfxScene.add( cannon.mesh );</code></pre>
+    
 <p>The parameters are the scene itself&nbsp; (since the cannon creates
 the beach-balls and adds them to the scene). We also pass in the size
 of the floor so the cannon knows when the balls have fallen off the
@@ -152,7 +224,16 @@ number of balls since the cannon won't launch a ball at every frame.
 We'll cover this shortly.</p>
 <p>The Cannon object has the following members:</p>
 
-<pre><code class="language-javascript">this.deltaT   = 0.0;<br>this.lastT    = 0.0;<br>this.mesh     = null;<br>this.magazine = [];<br>this.active   = [];<br>this.xLimit   = 0;<br>this.zLimit   = 0;<br>this.scene    = null;<br>this.gravity  = new THREE.Vector3(0, -0.002, 0);</code>&nbsp;</pre>
+<pre><code class="language-javascript">this.deltaT   = 0.0;
+this.lastT    = 0.0;
+this.mesh     = null;
+this.magazine = [];
+this.active   = [];
+this.xLimit   = 0;
+this.zLimit   = 0;
+this.scene    = null;
+this.gravity  = new THREE.Vector3(0, -0.002, 0);</code></pre>
+
 <p>Most are self-explanatory, simply providing local storage. The mesh  is the cannon itself.  The <span class="inline-code">magazine</span>
 is what it implies, the magazine in which the balls not currently
 launched are stored. Those balls that have been launched are kept in
@@ -164,38 +245,48 @@ re-creating beach-balls. Each ball is created just once. <span class="inline-cod
 is the time when we last updated all the balls. As you'll see, we
 throttle the updates since there is no sense to updating faster than 60
 fps.</p>
-<p>First, we create the cannon:<br>
-</p>
+<p>First, we create the cannon:</p>
 
-<pre><code class="language-javascript">var geometry = new THREE.CylinderGeometry( BASE_RADIUS * 2.0<br>                                           BASE_RADIUS * 3.0,<br>                                           BARREL_LENGTH,<br>                                           32, 1, true);<br><br>var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,<br>                                                      specular: 0x009900,<br>                                                      shininess: 30,<br>                                                      side:THREE.DoubleSide});<br><br>this.mesh = new THREE.Mesh( geometry, material );</code></pre>
+<pre><code class="language-javascript">var geometry = new THREE.CylinderGeometry( 
+    BASE_RADIUS * 2.0
+    BASE_RADIUS * 3.0,
+    BARREL_LENGTH,
+    32, 1, true);
+                        
+var material = new THREE.MeshPhongMaterial( { 
+    color : 0xdddddd,
+    specular: 0x009900, 
+    shininess: 30, 
+    side:THREE.DoubleSide});
+    
+this.mesh = new THREE.Mesh( geometry, material );</code></pre>
 
 <p>Now, let's look at the update method for the cannon, which is called from the animate() method in the lesson19. It's pretty simple, it first calls <span class="inline-code">fireCannon()</span> then <span class="inline-code">updateBalls().</span></p>
 
 <pre><code class="language-javascript">update: function() {
     this.fireCannon();
-	this.updateBalls();
+    this.updateBalls();
 }</code></pre>
 
 <p>The method <span class="inline-code">fireCannon()</span> is relatively simple, but has a couple of interesting aspects:</p>
 
 <pre><code class="language-javascript">fireCannon : function {
     var now = Performance.now();
-
     if ((now - this.lastT) < this.deltaT)
         return;
     this.lastT = now;
-
+    
     var newBall;
     if (this.magazine.length > 0) {
-        newBall = this.magazine.pop();
+        newBall = this.magazine.pop();    
+    } 
     else {
-        newBall = new BALL.BeachBall( { gravity : this.gravity    } );
+        newBall = new BALL.BeachBall( { gravity : this.gravity } );
         this.scene.add( newBall.mesh );
     }
-
-   this.initTrajectory( newBall );
-
-   this.active.push( newBall );
+    
+    this.initTrajectory( newBall );
+    this.active.push( newBall );
 }</code></pre>
 
 <p>The first step is to see if the delay since the last firing is long enough, i.e. longer than <span class="inline-code">deltaT</span>. If not, we just return. If has been long enough (which is usually the case), we need to fire the cannon. To do this, we first check if there is already one or more balls in the <span class="inline-code">magazine</span>. If so, we just pop one out of the <span class="inline-code">magazine</span>. If the <span class="inline-code">magazine</span> is empty (which is only true in the first few seconds of the demo) we need to allocate a brand new beach ball and add it to the scene.</p>
@@ -220,7 +311,7 @@ fps.</p>
     ball.mesh.material.opacity = 1;
 }</code></pre>
 
-<p>This is pretty straightforward. The trajectory of the </p>
+<p>This is pretty straightforward. The trajectory of the ball is detemined by the </p>
 <p>Finally, we push the newly fired beach ball into the active array.</p>
 <pre><code class="language-javascript">
 for ( var i=this.active.length-1; i>=0; i-- ) {
@@ -252,7 +343,7 @@ for ( var i=this.active.length-1; i>=0; i-- ) {
 <p>&nbsp;</p>
 <p>Before we look at how the Cannon manages the balls, let's look at the balls and their "physics". First we decare some constants</p>
 
-<pre><code class="language-javascript">var RESTITUTION     = 0.75;<br>var SEGMENTS        = 8;<br>var BASE_VELOCITY_V = 0.1;<br>var BASE_VELOCITY_H = 0.025;<br>var MIN_RHO         = 60.0 * Math.PI / 180.0;<br>var DELTA_RHO       = 30.0 * Math.PI / 180.0;<br>var BASE_RADIUS     = 0.1;<br>var DELTA_RADIUS    = 0.025;</code></pre>
+<pre><code class="language-javascript">var RESTITUTION     = 0.75;var SEGMENTS        = 8;var BASE_VELOCITY_V = 0.1;var BASE_VELOCITY_H = 0.025;var MIN_RHO         = 60.0 * Math.PI / 180.0;var DELTA_RHO       = 30.0 * Math.PI / 180.0;var BASE_RADIUS     = 0.1;var DELTA_RADIUS    = 0.025;</code></pre>
 
 <p>First we create some "constants". Most are self-explanatory such as
 the base velocity horizontally and vertically, the number of segments
@@ -269,7 +360,7 @@ variation. The geometry of this looks like this:</p>
 <p>So delta Rho will vary from <span class="inline-code">90-MinRho</span> to 0.</p>
 <p>The ball's constructor is </p>
 
-<pre><code class="language-javascript">BALL.BeachBall = function ( parameters ) {<br>	<br>	this.gravity  = new THREE.Vector3(0, -0.002, 0);<br>	this.vel      = new THREE.Vector3(0,0,0);<br>	this.loc      = new THREE.Vector3(0,0,0);<br>    this.radius   = 0;<br>    this.xLimit   = 0;<br>    this.zLimit   = 0;<br>    this.mesh     = null;<br><br>    GFX.setParameters(this, parameters);<br><br>    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();<br><br>    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );<br><br>    var material = new THREE.MeshLambertMaterial( { transparent: true });<br>    material.color.setRGB(Math.random(), Math.random(), Math.random());<br><br>    this.mesh = new THREE.Mesh( geometry, material );<br><br>    this.init();<br>};</code></pre>
+<pre><code class="language-javascript">BALL.BeachBall = function ( parameters ) {		this.gravity  = new THREE.Vector3(0, -0.002, 0);	this.vel      = new THREE.Vector3(0,0,0);	this.loc      = new THREE.Vector3(0,0,0);    this.radius   = 0;    this.xLimit   = 0;    this.zLimit   = 0;    this.mesh     = null;    GFX.setParameters(this, parameters);    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );    var material = new THREE.MeshLambertMaterial( { transparent: true });    material.color.setRGB(Math.random(), Math.random(), Math.random());    this.mesh = new THREE.Mesh( geometry, material );    this.init();};</code></pre>
 
 <p>Here we just set the gravity vector (the y component only, obviously). The value is pretty arbitrary.</p>       
 <p>And that's it!  Go on to the next page to see the actual rendered demo in all it's particulate glory!</p>
