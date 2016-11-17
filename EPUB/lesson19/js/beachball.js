@@ -2,7 +2,7 @@
  *  @author rkwright   /  http://www.geofx.com
  */
 
-var BALL = { revision: '02' };
+var BALL = { revision: '03' };
 
 
 BALL.BeachBall = function ( parameters ) {

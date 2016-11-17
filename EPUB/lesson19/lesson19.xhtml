@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html epub="http://www.idpf.org/2007/ops" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
 <head>
     <title>NeHe-EPUB-02</title>
-    <link rel="stylesheet" href="../css/NeHe-EPUB.css" type="text/css">
-    <link rel="stylesheet" href="../css/prism.css" type="text/css">
+    <link type="text/css" href="../css/NeHe-EPUB.css" rel="stylesheet"/>
+    <link type="text/css" href="../css/prism.css" rel="stylesheet"/>
     <script src="../js/prism.js"></script>
-    <meta charset="utf-8">
+    <meta charset="utf-8"/>
 </head>
 <body>
 <h2>Lesson 19 - Particle Engines</h2>
@@ -93,7 +93,7 @@ for (var p = 0; p &lt; PARTICLE_COUNT; p++) {
 Then we create a material that will be used to render each vertex of
 the geometry. The texture we supply is a simple PNG "snowflake" image
 that is partially transparent:</p>
-	<p><img alt="" src="images/snowflake_illus.png" height="195" width="197"></p>
+<p><img alt="Snowflake image" src="images/snowflake_illus.png" height="195" width="197"></img></p>
 	
 <pre><code class="language-javascript">var particleMaterial = new THREE.PointsMaterial({ 
     color: 0xffffff,
@@ -189,7 +189,7 @@ elastic (always rebounding to the same height), resititution would be
 1.0. In this case, it loses 25% of its bounce each time it hits the
 floor. So the bouncing looks like this:</p>
 
-<p><img alt="beachball restitution" src="images/Restitution.svg" width="400"></p>
+<p><img alt="beachball restitution" src="images/Restitution.svg" width="400"/></p>
 
 <p>The update function for the beach-ball is pretty simple since all it
 does is update the location using the current velocity then update the
@@ -213,7 +213,7 @@ position:</p>
     
 gfxScene.add( cannon.mesh );</code></pre>
     
-<p>The parameters are the scene itself&nbsp; (since the cannon creates
+<p>The parameters are the scene itself (since the cannon creates
 the beach-balls and adds them to the scene). We also pass in the size
 of the floor so the cannon knows when the balls have fallen off the
 floor. <span class="inline-code">deltaT</span> basically controls how
@@ -237,7 +237,8 @@ this.gravity  = new THREE.Vector3(0, -0.002, 0);</code></pre>
 <p>Most are self-explanatory, simply providing local storage. The mesh  is the cannon itself.  The <span class="inline-code">magazine</span>
 is what it implies, the magazine in which the balls not currently
 launched are stored. Those balls that have been launched are kept in
-the <span class="inline-code">active</span> array. When a ball falls off the floor and into the nether regions, it is moved from the <span class="inline-code">active</span> array into the <span class="inline-code">magazine</span>.
+the <span class="inline-code">active</span> array. When a ball falls off the floor and into the nether regions, it is
+    moved from the <span class="inline-code">active</span> array into the <span class="inline-code">magazine</span>.
 When a new ball is needed and the <span class="inline-code">magazine</span> is empty one is created. If
 there is one in the <span class="inline-code">magazine</span>, it is just popped out and re-used. In
 this way, we don't waste memory and performance by removing and
@@ -261,7 +262,9 @@ var material = new THREE.MeshPhongMaterial( {
     
 this.mesh = new THREE.Mesh( geometry, material );</code></pre>
 
-<p>Now, let's look at the update method for the cannon, which is called from the animate() method in the lesson19. It's pretty simple, it first calls <span class="inline-code">fireCannon()</span> then <span class="inline-code">updateBalls().</span></p>
+<p>Now, let's look at the update method for the cannon, which is called from the animate() method in the lesson19.
+    It's pretty simple, it first calls <span class="inline-code">fireCannon()</span>
+    hen <span class="inline-code">updateBalls().</span></p>
 
 <pre><code class="language-javascript">update: function() {
     this.fireCannon();
@@ -272,7 +275,7 @@ this.mesh = new THREE.Mesh( geometry, material );</code></pre>
 
 <pre><code class="language-javascript">fireCannon : function {
     var now = Performance.now();
-    if ((now - this.lastT) < this.deltaT)
+    if ((now - this.lastT) &lt; this.deltaT)
         return;
     this.lastT = now;
     
@@ -289,45 +292,69 @@ this.mesh = new THREE.Mesh( geometry, material );</code></pre>
     this.active.push( newBall );
 }</code></pre>
 
-<p>The first step is to see if the delay since the last firing is long enough, i.e. longer than <span class="inline-code">deltaT</span>. If not, we just return. If has been long enough (which is usually the case), we need to fire the cannon. To do this, we first check if there is already one or more balls in the <span class="inline-code">magazine</span>. If so, we just pop one out of the <span class="inline-code">magazine</span>. If the <span class="inline-code">magazine</span> is empty (which is only true in the first few seconds of the demo) we need to allocate a brand new beach ball and add it to the scene.</p>
-<p>Then we initialize the trajectory of the beach-ball, i.e. we &quot;fire&quot; the beach-ball. </p>
+<p>The first step is to see if the delay since the last firing is long enough, i.e. longer than <span class="inline-code">deltaT</span>.
+    If not, we just return. If has been long enough (which is usually the case), we need to fire the cannon. To do this, we first
+    check if there is already one or more balls in the <span class="inline-code">magazine</span>. If so, we just pop one out of the
+    <span class="inline-code">magazine</span>. If the <span class="inline-code">magazine</span> is empty (which is only true
+    in the first few seconds of the demo) we need to allocate a brand new beach ball and add it to the scene.</p>
+<p>Then we initialize the trajectory of the beach-ball, i.e. we &quot;fire&quot; the beach-ball. We  want the balls to come out the mouth of the cannon of
+course, but at different vertical angles and with some random
+variation. The geometry of this looks like this:</p>
+<p><img alt="Cannon Rho" src="images/Cannon-Rho.svg" height="450" width="300"/></p>
+<p>This is the code.</p>
 
 <pre><code class="language-javascript">initTrajectory: function ( ball ) {
-    var BASE_VELOCITY_V = 0.1;
-    var BASE_VELOCITY_H = 0.025;
-    var MIN_RHO         = 60.0 * Math.PI / 180.0;
+    var MUZZLE_VELOCITY = 0.125;
+    
+    var MIN_RHO         = 45.0 * Math.PI / 180.0;
     var DELTA_RHO       = 30.0 * Math.PI / 180.0;
 
-    var theta = Math.PI * 2.0 * Math.random();
-    var velX = Math.sin(theta) * BASE_VELOCITY_H;
-    var velZ = Math.cos(theta) * BASE_VELOCITY_H;
 
     var rho = MIN_RHO + DELTA_RHO * Math.random();
-    var velY = Math.sin(rho) * BASE_VELOCITY_V;
+    var velY = Math.sin(rho) * MUZZLE_VELOCITY;
+    var velH = MUZZLE_VELOCITY - velY;
+
+
+    var theta = Math.PI * 2.0 * Math.random();
+    var velX = Math.sin(theta) * velH;
+    var velZ = Math.cos(theta) * velH;
+
 
     ball.vel.set( velX, velY, velZ);
-    ball.loc.set(0, ball.radius, 0);
+    ball.loc.set(0,ball.radius, 0);
 
     ball.mesh.material.opacity = 1;
 }</code></pre>
 
-<p>This is pretty straightforward. The trajectory of the ball is detemined by the </p>
-<p>Finally, we push the newly fired beach ball into the active array.</p>
+<p>This is pretty straightforward. The trajectory of the ball is detemined by the muzzle velocity and the angle of the
+    trajectory.  <span class="inline-code">Rho</span> determines both the vertical and horizontal velocities.
+    <span class="inline-code">Theta</span> determines the direction of the ball. Note that <span class="inline-code">deltaRho</span>
+    is less than 45 degrees. Otherwise too many of the balls go more or less vertical and end up rolling too slowly
+    towards the edge of the floor. Finally, we push the newly fired beach ball into the <span class="inline-code">active</span> array.</p>
+<p>In <span class="inline-code">updateBalls</span>, we walk through the array of active balls. For each ball, we first
+    check if the ball is now completely transparent. If so it has fallen off the floor and disappeared. So we move it from
+    the <span class="inline-code">active</span> array to the <span class="inline-code">magazine</span> to be re-used. </p>
+<p>If it is not transparent, we update the ball's velocity and position by calling the ball's <span class="inline-code">update</span>
+    method. If the ball's height above the floor is less than the radius, we check if the ball is still on the floor.
+    If it is we bounce it by inverting the vertical (y) velocity less the ball's restitution. Then we place the ball
+    exactly on the floor.</p>
+<p>Alternatively, if the ball is NOT over the floor anymore, then it is not bounced but instead acceleratesdownward under
+    the force of gravity. Each time it's transparence is reduced by 2.5% until it finally disappears.</p>
 <pre><code class="language-javascript">
-for ( var i=this.active.length-1; i>=0; i-- ) {
+for ( var i=this.active.length-1; i&gt;=0; i-- ) {
 
     var ball = this.active[i];
 
-    if (ball.mesh.material.opacity <= 0) {
+    if (ball.mesh.material.opacity &lt;= 0) {
         this.active.splice(i, 1);
         this.magazine.push( ball );
     }
     else {
         ball.update();
 
-        if (ball.loc.y < 0.0) {
+        if (ball.loc.y &lt; ball.radius) {
                 
-            if (Math.abs(ball.loc.x) <= this.xLimit && Math.abs(ball.loc.z) <= this.zLimit) {
+            if (Math.abs(ball.loc.x) &lt;= this.xLimit &amp;&amp; Math.abs(ball.loc.z) &lt;= this.zLimit) {
                 ball.vel.y = -ball.vel.y * ball.restitution;
                 ball.loc.y = ball.radius;
             }
@@ -336,33 +363,8 @@ for ( var i=this.active.length-1; i>=0; i-- ) {
             }
         }
     }
-}</code></pre>
-
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>Before we look at how the Cannon manages the balls, let's look at the balls and their "physics". First we decare some constants</p>
-
-<pre><code class="language-javascript">var RESTITUTION     = 0.75;var SEGMENTS        = 8;var BASE_VELOCITY_V = 0.1;var BASE_VELOCITY_H = 0.025;var MIN_RHO         = 60.0 * Math.PI / 180.0;var DELTA_RHO       = 30.0 * Math.PI / 180.0;var BASE_RADIUS     = 0.1;var DELTA_RADIUS    = 0.025;</code></pre>
-
-<p>First we create some "constants". Most are self-explanatory such as
-the base velocity horizontally and vertically, the number of segments
-on the sphere and the base and delta radius of the balls. <span class="inline-code">RESTITUTION</span>
-is the amount that the ball will rebound each time it bounces. If the
-ball were perfectly elastic, resititution would be 1.0. In this case,
-it loses 25% of its bounce each time it hits the floor.</p>
-<p>We also want the balls to come out the mouth of the cannon of
-course, but at different vertical angles and with some random
-variation. The geometry of this looks like this:</p>
-
-<p><img alt="" src="images/Cannon-Rho.svg" height="450" width="300"></p>
-  
-<p>So delta Rho will vary from <span class="inline-code">90-MinRho</span> to 0.</p>
-<p>The ball's constructor is </p>
-
-<pre><code class="language-javascript">BALL.BeachBall = function ( parameters ) {		this.gravity  = new THREE.Vector3(0, -0.002, 0);	this.vel      = new THREE.Vector3(0,0,0);	this.loc      = new THREE.Vector3(0,0,0);    this.radius   = 0;    this.xLimit   = 0;    this.zLimit   = 0;    this.mesh     = null;    GFX.setParameters(this, parameters);    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );    var material = new THREE.MeshLambertMaterial( { transparent: true });    material.color.setRGB(Math.random(), Math.random(), Math.random());    this.mesh = new THREE.Mesh( geometry, material );    this.init();};</code></pre>
-
-<p>Here we just set the gravity vector (the y component only, obviously). The value is pretty arbitrary.</p>       
+}</code>
+</pre>
 <p>And that's it!  Go on to the next page to see the actual rendered demo in all it's particulate glory!</p>
 </body>
 </html>
