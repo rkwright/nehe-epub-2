@@ -94,7 +94,11 @@ CANNON.Cannon.prototype = {
         this.active.push( newBall );
  	},
 
-
+    /**
+     * Update each beachball's location by iterating through the
+     * array of active balls,  If transparent, move to the magazine,
+     * else make it bounce
+     */
     updateBalls: function () {
         for (var i = this.active.length - 1; i >= 0; i--) {
 
@@ -125,8 +129,7 @@ CANNON.Cannon.prototype = {
     },
 
     /**
-     * Update each beachball's location by iterating through the
-     * array of active balls
+     * Just fire the cannon if needed and then update the balls.
      */
     update: function() {
         //console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
