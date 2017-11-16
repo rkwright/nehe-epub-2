@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
 <head>
     <title>NeHe-EPUB-02</title>
+    <meta charset="utf-8"/>
     <link type="text/css" href="../css/NeHe-EPUB.css" rel="stylesheet"/>
     <link type="text/css" href="../css/prism.css" rel="stylesheet"/>
-    <script src="../js/prism.js"></script>
-    <meta charset="utf-8"/>
+    <script src="../three-js/prism.js"></script>
 </head>
 <body>
 <h2>Lesson 19 - Particle Engines</h2>
@@ -93,7 +93,7 @@ for (var p = 0; p &lt; PARTICLE_COUNT; p++) {
 Then we create a material that will be used to render each vertex of
 the geometry. The texture we supply is a simple PNG "snowflake" image
 that is partially transparent:</p>
-<p><img alt="Snowflake image" src="images/snowflake_illus.png" height="195" width="197"></img></p>
+<p><img alt="Snowflake image" src="images/snowflake_illus.png" height="195" width="197"/></p>
 	
 <pre><code class="language-javascript">var particleMaterial = new THREE.PointsMaterial({ 
     color: 0xffffff,
