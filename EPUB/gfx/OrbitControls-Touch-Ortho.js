@@ -205,7 +205,7 @@ THREE.OrbitControls = function ( object, domElement ) {
         } else {
 
             // camera neither orthographic or perspective
-            console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - pan disabled.' );
+            console.warn( 'WARNING: OrbitControls.three-js encountered an unknown camera type - pan disabled.' );
 
         }
 
@@ -490,8 +490,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
     function onKeyDown( event ) {
 
-        console.log("keyCode: " + event.keyCode);
-
         if ( scope.enabled === false || scope.noKeys === true || scope.noPan === true ) return;
 
         switch ( event.keyCode ) {
@@ -663,7 +661,7 @@ THREE.OrbitControls = function ( object, domElement ) {
     this.domElement.addEventListener( 'touchend', touchend, false );
     this.domElement.addEventListener( 'touchmove', touchmove, false );
 
-    // window.addEventListener( 'keydown', onKeyDown, false );
+    window.addEventListener( 'keydown', onKeyDown, false );
 
     // force an update at start
     this.update();
