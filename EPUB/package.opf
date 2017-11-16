@@ -68,6 +68,31 @@
 		<item id="lesson18-gl" href="lesson18/lesson18webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 		<item id="lesson19" href="lesson19/lesson19.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 		<item id="lesson19-gl" href="lesson19/lesson19webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson20" href="lesson20/lesson20.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson20-gl" href="lesson20/lesson20webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson21" href="lesson21/lesson21.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson21-gl" href="lesson21/lesson21webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson22" href="lesson22/lesson22.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson22-gl" href="lesson22/lesson22webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson23" href="lesson23/lesson23.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson23-gl" href="lesson23/lesson23webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson24" href="lesson24/lesson24.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson25" href="lesson25/lesson25.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson25-gl" href="lesson25/lesson25webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson26" href="lesson26/lesson26.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson26-gl" href="lesson26/lesson26webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson27" href="lesson27/lesson27.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson27-gl" href="lesson27/lesson27webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson28" href="lesson28/lesson28.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson28-gl" href="lesson28/lesson28webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson29" href="lesson29/lesson29.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson29-gl" href="lesson29/lesson29webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson30" href="lesson30/lesson30.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson30-gl" href="lesson30/lesson30webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson31" href="lesson31/lesson31.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson31-gl" href="lesson31/lesson31webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson32" href="lesson32/lesson32.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+		<item id="lesson32-gl" href="lesson32/lesson32webgl.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 	</manifest>
 	<spine>
 		<itemref idref="coverpage" />
@@ -79,6 +104,31 @@
 		<itemref idref="lesson18-gl" properties="rendition:layout-pre-paginated"/>
 		<itemref idref="lesson19" />
 		<itemref idref="lesson19-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson20" />
+		<itemref idref="lesson20-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson21" />
+		<itemref idref="lesson21-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson22" />
+		<itemref idref="lesson22-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson23" />
+		<itemref idref="lesson23-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson24" />
+		<itemref idref="lesson25" />
+		<itemref idref="lesson25-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson26" />
+		<itemref idref="lesson26-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson27" />
+		<itemref idref="lesson27-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson28" />
+		<itemref idref="lesson28-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson29" />
+		<itemref idref="lesson29-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson30" />
+		<itemref idref="lesson30-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson31" />
+		<itemref idref="lesson31-gl" properties="rendition:layout-pre-paginated"/>
+		<itemref idref="lesson32" />
+		<itemref idref="lesson32-gl" properties="rendition:layout-pre-paginated"/>
 		<itemref idref="colophon"/>
 	</spine>
 </package>
