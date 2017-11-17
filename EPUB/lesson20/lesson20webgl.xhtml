@@ -59,8 +59,8 @@
 
                 var geom = new THREE.BoxGeometry( 2, 2, 2 );
 
-                var texture = new THREE.ImageUtils.loadTexture("images/image" + number + ".bmp");
-                var mask = new THREE.ImageUtils.loadTexture("images/mask" + number + ".bmp");
+                var texture = new THREE.ImageUtils.loadTexture("images/image" + number + ".jpg");
+                var mask = new THREE.ImageUtils.loadTexture("images/mask" + number + ".jpg");
 
                 var material = new THREE.MeshBasicMaterial( { map:texture, alphaMap:mask, side:THREE.DoubleSide, transparent:true } );
 
