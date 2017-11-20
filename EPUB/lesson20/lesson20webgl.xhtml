@@ -30,7 +30,8 @@
                 canvasHeight : 1024,
                 controls : true,
 				axesHeight:10,
-				displayStats:true
+				displayStats:true,
+				datgui:true
             });
 
             setupDatGUI();
@@ -80,7 +81,7 @@
 
                 var gui = new dat.GUI();
 
-                gui.add(options, "mask", [ maskList[0], maskList[1] ]).onChange(function() {
+                gfxScene.gui.add(options, "mask", [ maskList[0], maskList[1] ]).onChange(function() {
 
                     options.mask = maskList.indexOf(options.mask) + 1;
                     makeMesh( options.mask );

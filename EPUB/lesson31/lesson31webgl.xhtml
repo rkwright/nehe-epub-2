@@ -43,7 +43,9 @@
                 canvasHeight : 1024,
                 axesHeight:10,
 				controls:true,
-				displayStats:true});
+				displayStats:true,
+				datgui:true
+			});
 
 			setupDatGUI();
 
@@ -378,9 +380,7 @@
 
                 options.model = modelList[0];
 
-                var gui = new dat.GUI();
-
-                gui.add(options, "model", [ modelList[0],modelList[1],modelList[2],modelList[3],modelList[4],modelList[5],modelList[6],modelList[7] ]).onChange(function() {
+                gfxScene.gui.add(options, "model", [ modelList[0],modelList[1],modelList[2],modelList[3],modelList[4],modelList[5],modelList[6],modelList[7] ]).onChange(function() {
                     var modelType = modelList.indexOf( options.model );
                     loadModel(modelType);
                 });

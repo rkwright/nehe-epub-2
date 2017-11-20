@@ -41,6 +41,7 @@
 				axisHeight:10,
 				controls:true,
 				displayStats:true,
+				datgui:true,
                 floorX:REPEAT_SIZE*2,
                 floorZ:REPEAT_SIZE*2,
 				floorRepeat:REPEAT_SIZE,
@@ -91,7 +92,7 @@
 
                  var gui = new dat.GUI();
 
-                 gui.add(options, "viewType", [ viewTypes[0], viewTypes[1] ]).onChange(function() {
+                 gfxScene.gui.add(options, "viewType", [ viewTypes[0], viewTypes[1] ]).onChange(function() {
 
                      viewType = viewTypes.indexOf(options.viewType);
                      if ( viewType === 1 )

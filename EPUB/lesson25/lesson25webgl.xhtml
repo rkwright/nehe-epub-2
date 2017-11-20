@@ -37,10 +37,13 @@
 	        var curStep = 0;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { cameraPos : [0, 6, 12],
-				                                        axesHeight:10,
-									                    controls:true,
-									                    displayStats:true });
+			var gfxScene = new GFX.Scene( {
+				cameraPos : [0, 6, 12],
+				axesHeight:10,
+				controls:true,
+				displayStats:true,
+				datgui:true
+			});
 
 			setupDatGUI();
 
@@ -141,9 +144,7 @@
 
                 options.shape = vertList[0];
 
-                var gui = new dat.GUI();
-
-                gui.add(options, "shape", [ vertList[0], vertList[1], vertList[2] ]).onChange(function() {
+                gfxScene.gui.add(options, "shape", [ vertList[0], vertList[1], vertList[2] ]).onChange(function() {
                     var newVertType = vertList.indexOf( options.shape );
                     calcDeltas(newVertType);
                 });

@@ -47,7 +47,8 @@
 			    cameraPos : [8, 2, 40],
                 axesHeight: 30,
                 controls:true,
-                displayStats:true
+                displayStats:true,
+				datgui:true
             });
 
 			setupDatGUI();
@@ -517,9 +518,7 @@
                     }
                 };
 
-                var gui = new dat.GUI();
-
-                gui.add( options, 'reset' );
+                gfxScene.gui.add( options, 'reset' );
             }
 
             /**

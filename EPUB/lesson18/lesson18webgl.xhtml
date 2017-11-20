@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
         <title>NEHE Lesson 18</title>
 		<meta charset="UTF-8"/>
@@ -32,7 +32,9 @@
 			canvasWidth:768,
             axesHeight:10,
             controls:true,
-            displayStats:true });
+            displayStats:true,
+			datgui:true
+        });
 
         setupDatGUI();
 
@@ -146,9 +148,7 @@
             options.materialType = 0;
             options.material = materialList[0];
 
-            gui = new dat.GUI({autoplace:false});
-
-            gui.add(options, "material", [
+            gfxScene.gui.add(options, "material", [
                 materialList[0],
                 materialList[1],
                 materialList[2]
@@ -160,7 +160,7 @@
 
             options.quad = quadList[0];
 
-            gui.add(options, "quad", [
+            gfxScene.gui.add(options, "quad", [
                 quadList[0],
                 quadList[1],
                 quadList[2],
@@ -179,12 +179,6 @@
                 quadType = quadList.indexOf(options.quad);
                 quadric = makeQuad(quadType);
             });
-
-            var guiContainer = document.createElement( 'div' );
-            guiContainer.setAttribute("style", "position:absolute;top:0;left:0;z-index:10;");
-            document.body.appendChild( guiContainer );
-            //var guiContainer = document.getElementById('dat.gui');
-            guiContainer.appendChild(gui.domElement);
         }
 
         /**

@@ -36,7 +36,9 @@
                 canvasHeight : 1024,
                 controls : true,
 				axesHeight:10,
-				displayStats:true});
+				displayStats:true,
+				datgui:true
+            });
 
             setupDatGUI();
 
@@ -89,11 +91,11 @@
 
                 var gui = new dat.GUI();
 
-                gui.add(options, "image", [ imageList[0], imageList[1] ]).onChange(function() {
+                gfxScene.gui.add(options, "image", [ imageList[0], imageList[1] ]).onChange(function() {
                     makeMesh( options.bumped, options.image );
                 });
 
-                gui.add(options, "bumped" ).onChange(function() {
+                gfxScene.gui.add(options, "bumped" ).onChange(function() {
                     makeMesh( options.bumped, options.image );
                 });
             }
